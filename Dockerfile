@@ -5,11 +5,8 @@ RUN apt-get update
 RUN apt-get --yes install curl \
     build-essential \
     libffi-dev \
-    shared-mime-info \
     libpq-dev \
     git \
-    wget \
-    unzip \
     redis
 #RUN rm -rf /var/lib/apt/lists/*
 
