@@ -225,7 +225,6 @@ async def post_usage(
     )
 
 
-@router.get("/all-usage", response_model=List[Usage])
 async def get_usage(
     _: UserRBAC = Depends(token_admin_verified),
     conn: AsyncConnection = Depends(get_async_connection),

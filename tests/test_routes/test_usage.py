@@ -5,7 +5,6 @@ from typing import Iterable, List, Union
 from unittest.mock import ANY, AsyncMock
 from uuid import UUID, uuid4
 
-import numpy as np
 import pytest
 import pytest_mock
 import requests
@@ -93,17 +92,8 @@ def test_post_usage(
             list({x.subscription_id for x in post_data.usage_list}),
         )
 
-        get_resp = client.get(
-            "usage/all-usage",
-        )
-
-        assert get_resp.status_code == 200
-
-        resp_data = get_resp.json()
-        assert np.isclose(
-            sum(i["total_cost"] for i in resp_data),
-            sum(i.total_cost for i in post_data.usage_list),
-        )
+        get_resp = client.get("usage/all-usage")
+        assert get_resp.status_code == 405
 
 
 @pytest.mark.asyncio
@@ -487,19 +477,8 @@ def test_post_monthly_usage(
 
         assert resp.status_code == 200
 
-        get_resp = client.get(
-            "usage/all-usage",
-        )
-
-        assert get_resp.status_code == 200
-
-        resp_data = get_resp.json()
-        expected_ids = {item.id for item in post_example_2_data.usage_list}
-        resp_usage = [Usage(**item) for item in resp_data if item["id"] in expected_ids]
-        assert np.isclose(
-            sum(i.total_cost for i in resp_usage),
-            sum(i.total_cost for i in post_example_2_data.usage_list),
-        )
+        get_resp = client.get("usage/all-usage")
+        assert get_resp.status_code == 405
 
 
 @pytest.mark.asyncio
