@@ -204,6 +204,13 @@ async def send_generic_email(
     sub_summary = await _fetch_one(
         database, get_subscriptions_summary(sub_id=subscription_id)
     )
+    if sub_summary and sub_summary["abolished"]:
+        logger.info(
+            "Subscription %s is abolished and will not receive email notifications.",
+            subscription_id,
+        )
+        return
+
     subscription_name = None
     if sub_summary:
         template_data["summary"] = dict(sub_summary)
@@ -639,8 +646,8 @@ def prepare_roles_email(
 
     Given a new and an old SubscriptionStatus, return a dictionary of arguments that can be given
     as `send_generic_email(**prepare_roles_email(...))` to send a role assignment change
-    email. Unless the new and the old role assignment are the same, and thus no email is
-    needed, in which case return an empty dictionary.
+    email. Unless the new and the old role assignment are the same, and thus no email
+    is needed, in which case return an empty dictionary.
     """
     # Convert to Dicts so we can remove items
     old_rbac = [x.model_dump() for x in old_status.role_assignments]
@@ -840,7 +847,7 @@ def extract_sub_id(my_dict: Mapping) -> UUID:
 async def prepare_summary_email(
     database: AsyncConnection, since_this_datetime: Optional[datetime] = None
 ) -> dict:
-    """Prepares and returns data needed to send summary email.
+    """Prepares and returns data needed for the summary email.
 
     Args:
         database: a Database, with record of Azure subscriptions
